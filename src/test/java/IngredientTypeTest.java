@@ -7,8 +7,12 @@ import org.junit.Test;
 public class IngredientTypeTest {
 
     @Test
-    public void testIngredientType() {
+    public void testSauceType() {
         assertEquals(IngredientType.SAUCE, IngredientType.valueOf("SAUCE"));
+    }
+
+    @Test
+    public void testFillingType() {
         assertEquals(IngredientType.FILLING, IngredientType.valueOf("FILLING"));
     }
 

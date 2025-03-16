@@ -17,14 +17,27 @@ public class BurgerTest {
     @Mock
     private Bun bunMock;
 
+    @Mock
+    private Ingredient ingredientMock1;
+
+    @Mock
+    private Ingredient ingredientMock2;
+
     @InjectMocks
     private Burger burger;
 
     @Before
     public void setUp() {
-        // Setting up a mock bun
         when(bunMock.getName()).thenReturn("black bun");
         when(bunMock.getPrice()).thenReturn(100f);
+
+        when(ingredientMock1.getType()).thenReturn(IngredientType.FILLING);
+        when(ingredientMock1.getName()).thenReturn("cutlet");
+        when(ingredientMock1.getPrice()).thenReturn(100f);
+
+        when(ingredientMock2.getType()).thenReturn(IngredientType.SAUCE);
+        when(ingredientMock2.getName()).thenReturn("hot sauce");
+        when(ingredientMock2.getPrice()).thenReturn(50f);
     }
 
     @Test
@@ -35,53 +48,50 @@ public class BurgerTest {
 
     @Test
     public void testAddIngredient() {
-        Ingredient ingredientMock = new Ingredient(IngredientType.FILLING, "cutlet", 100f);
-        burger.addIngredient(ingredientMock);
-        assertTrue(burger.ingredients.contains(ingredientMock));
+        burger.addIngredient(ingredientMock1);
+        assertTrue(burger.ingredients.contains(ingredientMock1));
     }
 
     @Test
     public void testRemoveIngredient() {
-        Ingredient ingredientMock = new Ingredient(IngredientType.FILLING, "cutlet", 100f);
-        burger.addIngredient(ingredientMock);
-
+        burger.addIngredient(ingredientMock1);
         burger.removeIngredient(0);
-        assertFalse(burger.ingredients.contains(ingredientMock));
+        assertFalse(burger.ingredients.contains(ingredientMock1));
     }
 
     @Test
     public void testMoveIngredient() {
-        Ingredient ingredient1 = new Ingredient(IngredientType.FILLING, "cutlet", 100f);
-        Ingredient ingredient2 = new Ingredient(IngredientType.FILLING, "sauce", 50f);
-        burger.addIngredient(ingredient1);
-        burger.addIngredient(ingredient2);
-
-        burger.moveIngredient(0, 1); // move cutlet to index 1
-        assertEquals(ingredient1, burger.ingredients.get(1));
+        burger.addIngredient(ingredientMock1);
+        burger.addIngredient(ingredientMock2);
+        burger.moveIngredient(0, 1);
+        assertEquals(ingredientMock1, burger.ingredients.get(1));
     }
 
     @Test
     public void testGetPrice() {
-        bunMock = new Bun("black bun", 100f);
         burger.setBuns(bunMock);
-        burger.addIngredient(new Ingredient(IngredientType.FILLING, "cutlet", 100f));
-        burger.addIngredient(new Ingredient(IngredientType.SAUCE, "hot sauce", 50f));
+        burger.addIngredient(ingredientMock1);
+        burger.addIngredient(ingredientMock2);
 
-        float expectedPrice = (bunMock.getPrice() * 2) + 100f + 50f;
+        float expectedPrice = (bunMock.getPrice() * 2) +
+                ingredientMock1.getPrice() +
+                ingredientMock2.getPrice();
+
         assertEquals(expectedPrice, burger.getPrice(), 0);
     }
 
     @Test
     public void testGetReceipt() {
-        bunMock = new Bun("black bun", 100f);
         burger.setBuns(bunMock);
+        burger.addIngredient(ingredientMock1);
+        burger.addIngredient(ingredientMock2);
 
-        Ingredient ingredient1 = new Ingredient(IngredientType.FILLING, "cutlet", 100f);
-        Ingredient ingredient2 = new Ingredient(IngredientType.SAUCE, "hot sauce", 50f);
-        burger.addIngredient(ingredient1);
-        burger.addIngredient(ingredient2);
+        String expectedReceipt = "(==== black bun ====)\n" +
+                "= filling cutlet =\n" +
+                "= sauce hot sauce =\n" +
+                "(==== black bun ====)\n\n" +
+                "Price: 350.0\n";
 
-        String expectedReceipt = "(==== black bun ====)\n= filling cutlet =\n= sauce hot sauce =\n(==== black bun ====)\n\nPrice: 350.0\n";
         assertEquals(expectedReceipt, burger.getReceipt());
     }
 
